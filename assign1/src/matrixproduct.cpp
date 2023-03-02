@@ -177,9 +177,9 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
             for (k = 0; k < m_ar; k += bkSize) {
                 // Multiply block A(i,k) by block B(k,j) and accumulate in block C(i,j)
                 for (ii = i; ii < min(i + bkSize, m_ar); ii++) {
-                    for (jj = j; jj < min(j + bkSize, m_br); jj++) {
-                        for (kk = k; kk < min(k + bkSize, m_ar); kk++) {
-                            phc[ii * m_br + jj] += pha[ii * m_ar + kk] * phb[kk * m_br + jj];
+                    for (kk = k; kk < min(k + bkSize, m_br); kk++) {
+                        for (jj = j; jj < min(j + bkSize, m_ar); jj++) {
+                            phc[ii * m_ar + jj] += pha[ii * m_ar + kk] * phb[kk * m_br + jj];
                         }
                     }
                 }
