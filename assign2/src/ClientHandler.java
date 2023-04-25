@@ -3,7 +3,7 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-private static class ClientHandler implements Runnable {
+public class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader input;
     private PrintWriter output;
@@ -31,7 +31,7 @@ private static class ClientHandler implements Runnable {
                 // TODO: Perform authentication
                 if (isValidCredentials(username, password)) {
                     token = generateToken();
-                    connectedClients.put(username, token);
+                    //connectedClients.put(username, token);
                     output.println("Authentication successful. Token: " + token);
                     break;
                 } else {
@@ -40,25 +40,26 @@ private static class ClientHandler implements Runnable {
             }
 
             // Client Menu
-            while (true) {
+            /*while (true) {
                 output.println("Select an option:");
                 output.println("1. Find an opponent");
                 output.println("2. View waiting list");
                 output.println("3. Quit");
 
                 String choice = input.readLine();
-
+                  
                 if (choice.equals("1")) {
-                    findOpponent();
+                    //findOpponent();
                 } else if (choice.equals("2")) {
-                    viewWaitingList();
+                    //viewWaitingList();
                 } else if (choice.equals("3")) {
-                    quit();
+                    //quit();
                     break;
                 } else {
                     output.println("Invalid choice. Please try again.");
                 }
-            }
+                //System.out.println(input.readLine());
+            }*/
 
             socket.close();
         } catch (IOException e) {
@@ -74,7 +75,7 @@ private static class ClientHandler implements Runnable {
     private String generateToken() {
         return UUID.randomUUID().toString();
     }
-
+    /* 
     private void findOpponent() {
         waitingClients.put(username, token);
         output.println("Finding opponent...");
@@ -113,12 +114,13 @@ private static class ClientHandler implements Runnable {
 
     private void quit() {
         // Remove the client from any lists
+        
         connectedClients.remove(username);
         waitingClients.remove(username);
         playingClients.remove(username);
 
         output.println("Goodbye!");
-    }
+    }*/
 }
 
 

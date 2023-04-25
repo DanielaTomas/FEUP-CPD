@@ -30,7 +30,7 @@ public class GameServer {
                 Socket socket = serverSocket.accept();
 
                 // create a new client handler thread
-                ClientHandler handler = new ClientHandler(socket, this);
+                ClientHandler handler = new ClientHandler(socket);
                 gameThreadPool.execute(handler);
             }
 
