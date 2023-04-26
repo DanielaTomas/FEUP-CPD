@@ -9,9 +9,9 @@ public class GameServer {
     private final int port;
     private final int maxGames;
     private final ThreadPoolExecutor gameThreadPool;
-    private final ConcurrentHashMap<String, GameClient> connectedClients;
-    private final ConcurrentHashMap<String, GameClient> waitingClients;
-    private final ConcurrentHashMap<String, Game> playingGames;
+    private final ConcurrentHashMap<String, String> connectedClients;//second string is user token
+    private final ConcurrentHashMap<String, Long> waitingClients;//second string is waiting time
+    private final ConcurrentHashMap<String, Game> playingGames;//second item is game instance
 
     public GameServer(int port, int maxGames) {
         this.port = port;
@@ -30,7 +30,7 @@ public class GameServer {
                 Socket socket = serverSocket.accept();
 
                 // create a new client handler thread
-                ClientHandler handler = new ClientHandler(socket);
+                ClientHandler handler = new ClientHandler(socket,this);
                 gameThreadPool.execute(handler);
             }
 
@@ -38,6 +38,18 @@ public class GameServer {
             System.out.println("Server exception: " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    public ConcurrentHashMap<String, String> getConnectedClients(){
+        return connectedClients;
+    }
+
+    public ConcurrentHashMap<String, Long> getWaitingClients(){
+        return waitingClients;
+    }
+
+    public ConcurrentHashMap<String, Game> getPlayingGames(){//TODO: do we really need this
+        return playingGames;
     }
 
     public static void main(String[] args) {

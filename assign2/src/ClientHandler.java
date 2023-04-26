@@ -5,13 +5,15 @@ import java.util.concurrent.*;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
+    private GameServer server;
     private BufferedReader input;
     private PrintWriter output;
     private String username;
     private String token;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket,GameServer server) {
         this.socket = socket;
+        this.server = server;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class ClientHandler implements Runnable {
                 // TODO: Perform authentication
                 if (isValidCredentials(username, password)) {
                     token = generateToken();
-                    //connectedClients.put(username, token);
+                    server.getConnectedClients().put(username, token);
                     output.println("Authentication successful. Token: " + token);
                     break;
                 } else {
