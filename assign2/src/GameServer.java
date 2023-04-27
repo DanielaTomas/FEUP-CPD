@@ -1,5 +1,6 @@
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -9,7 +10,7 @@ public class GameServer {
     private final int port;
     private final int maxGames;
     private final ThreadPoolExecutor gameThreadPool;
-    private final ConcurrentHashMap<String, String> connectedClients;//second string is user token
+    private final ConcurrentHashMap<String, UUID> connectedClients;//second value is user token
     private final ConcurrentHashMap<String, Long> waitingClients;//second string is waiting time
     private final ConcurrentHashMap<String, Game> playingGames;//second item is game instance
 
@@ -40,7 +41,7 @@ public class GameServer {
         }
     }
 
-    public ConcurrentHashMap<String, String> getConnectedClients(){
+    public ConcurrentHashMap<String, UUID> getConnectedClients(){
         return connectedClients;
     }
 

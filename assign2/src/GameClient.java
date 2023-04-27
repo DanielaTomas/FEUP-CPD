@@ -3,6 +3,18 @@ import java.util.Scanner;
 import java.io.*;
 
 public class GameClient {
+    private static final String SAVE_FILE_PATH = "save.txt";//TODO: maybe concat username to filename
+
+    private void parseAndStoreToken() {
+        try {
+            FileWriter fileWriter = new FileWriter(SAVE_FILE_PATH);
+            fileWriter.write(token);
+            fileWriter.close();
+            System.out.println("Token stored to save file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     public static void main(String[] args) {
         if (args.length < 2) return;
@@ -18,18 +30,22 @@ public class GameClient {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
             
+            
             serverMessage = input.readLine();//read message from server
             System.out.println(serverMessage);//print to console
             
             output.println(scanner.nextLine());//send text written on console to server
 
-            serverMessage = input.readLine();
-            System.out.println(serverMessage);
-            
-            output.println(scanner.nextLine());
 
             serverMessage = input.readLine();
             System.out.println(serverMessage);
+            /*
+            output.println(scanner.nextLine());
+
+            serverMessage = input.readLine();
+            System.out.println(serverMessage);*/
+
+            
  
         } catch (UnknownHostException ex) {
  

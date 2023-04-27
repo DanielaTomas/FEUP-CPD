@@ -9,7 +9,7 @@ public class ClientHandler implements Runnable {
     private BufferedReader input;
     private PrintWriter output;
     private String username;
-    private String token;
+    private UUID token;
 
     public ClientHandler(Socket socket,GameServer server) {
         this.socket = socket;
@@ -27,14 +27,11 @@ public class ClientHandler implements Runnable {
                 output.println("Enter username:");
                 username = input.readLine();
 
-                output.println("Enter password:");
-                String password = input.readLine();
-
                 // TODO: Perform authentication
-                if (isValidCredentials(username, password)) {
+                if (isValidCredentials(username)) {
                     token = generateToken();
                     server.getConnectedClients().put(username, token);
-                    output.println("Authentication successful. Token: " + token);
+                    output.println("Authentication successful. Token: " + token.toString());
                     break;
                 } else {
                     output.println("Invalid credentials. Please try again.");
@@ -42,7 +39,7 @@ public class ClientHandler implements Runnable {
             }
 
             // Client Menu
-            /*while (true) {
+            while (true) {
                 output.println("Select an option:");
                 output.println("1. Find an opponent");
                 output.println("2. View waiting list");
@@ -60,8 +57,8 @@ public class ClientHandler implements Runnable {
                 } else {
                     output.println("Invalid choice. Please try again.");
                 }
-                //System.out.println(input.readLine());
-            }*/
+                System.out.println(input.readLine());
+            }
 
             socket.close();
         } catch (IOException e) {
@@ -69,13 +66,13 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private boolean isValidCredentials(String username, String password) {
+    private boolean isValidCredentials(String username) {
         // TODO: Implement authentication logic
         return true;
     }
 
-    private String generateToken() {
-        return UUID.randomUUID().toString();
+    private UUID generateToken() {
+        return UUID.randomUUID();
     }
     /* 
     private void findOpponent() {
