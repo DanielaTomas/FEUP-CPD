@@ -10,9 +10,9 @@ public class GameServer {
     private final int port;
     private final int maxGames;
     private final ThreadPoolExecutor gameThreadPool;
-    private final ConcurrentHashMap<String, UUID> connectedClients;//second value is user token
-    private final ConcurrentHashMap<String, Long> waitingClients;//second string is waiting time
-    private final ConcurrentHashMap<String, Game> playingGames;//second item is game instance
+    private final ConcurrentHashMap<UUID, String> connectedClients;//second value is user token
+    private final ConcurrentHashMap<UUID, Long> waitingClients;//second string is waiting time
+    private final ConcurrentHashMap<UUID, Game> playingGames;//second item is game instance
 
     public GameServer(int port, int maxGames) {
         this.port = port;
@@ -41,15 +41,15 @@ public class GameServer {
         }
     }
 
-    public ConcurrentHashMap<String, UUID> getConnectedClients(){
+    public ConcurrentHashMap<UUID, String> getConnectedClients(){
         return connectedClients;
     }
 
-    public ConcurrentHashMap<String, Long> getWaitingClients(){
+    public ConcurrentHashMap<UUID, Long> getWaitingClients(){
         return waitingClients;
     }
 
-    public ConcurrentHashMap<String, Game> getPlayingGames(){//TODO: do we really need this
+    public ConcurrentHashMap<UUID, Game> getPlayingGames(){//TODO: do we really need this
         return playingGames;
     }
 

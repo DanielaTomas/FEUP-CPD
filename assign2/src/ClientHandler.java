@@ -23,23 +23,26 @@ public class ClientHandler implements Runnable {
             output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
 
             // Client Authentication
-            while (true) {
-                output.println("Enter username:");
-                username = input.readLine();
 
-                // TODO: Perform authentication
-                if (isValidCredentials(username)) {
-                    token = generateToken();
-                    server.getConnectedClients().put(username, token);
-                    output.println("Authentication successful. Token: " + token.toString());
-                    break;
-                } else {
-                    output.println("Invalid credentials. Please try again.");
-                }
+            output.println("Enter username:");
+            String clientMessage = input.readLine();
+
+            if (isValidToken(clientMessage)) {
+                token = UUID.fromString(clientMessage);
+                username = server.getConnectedClients().get(token);
+                output.println("Authentication successful. Welcome back, " + username);
+                System.out.println("Authentication successful. Welcome back, " + username);
+            } else {
+                username = clientMessage;
+                token = generateToken();
+                server.getConnectedClients().put(token, username);
+                output.println("Registration successful. Welcome, " + username + " : " + token.toString());
+                System.out.println("Registration successful. Welcome, " + username );
             }
 
+
             // Client Menu
-            while (true) {
+            /*while (true) {
                 output.println("Select an option:");
                 output.println("1. Find an opponent");
                 output.println("2. View waiting list");
@@ -58,7 +61,7 @@ public class ClientHandler implements Runnable {
                     output.println("Invalid choice. Please try again.");
                 }
                 System.out.println(input.readLine());
-            }
+            }*/
 
             socket.close();
         } catch (IOException e) {
@@ -66,9 +69,17 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private boolean isValidCredentials(String username) {
-        // TODO: Implement authentication logic
-        return true;
+    private boolean isValidToken(String message) {
+        try {
+            UUID tempToken = UUID.fromString(message);
+            //if ( tempToken != null && server.getConnectedClients().containsKey(tempToken) ) return true;
+            
+            return true;
+        } catch (IllegalArgumentException e) {
+            // Handle the case where tempToken is not a valid UUID
+            return false;
+        }
+        
     }
 
     private UUID generateToken() {
