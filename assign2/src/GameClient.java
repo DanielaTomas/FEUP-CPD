@@ -6,20 +6,6 @@ import java.io.*;
 public class GameClient {
 
     
-
-    /*private void parseAndStoreToken(String serverMessage) {
-        try {
-            String token = serverMessage.substring(serverMessage.indexOf(":") + 2);
-            userToken = UUID.fromString(token);
-            FileWriter fileWriter = new FileWriter(SAVE_FILE_PATH);
-            fileWriter.write(token);
-            fileWriter.close();
-            System.out.println("Token stored to save file.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-    
     public static void main(String[] args) {
         if (args.length < 2) return;
  
@@ -43,8 +29,9 @@ public class GameClient {
             System.out.println(serverMessage);//print to console
             
             userName = scanner.nextLine();
-            fileName = userName + "token.txt";
+            fileName = "tokens/"+ userName + "token.txt";
             tokenFile = new File(fileName);
+            System.out.println(tokenFile.getAbsolutePath());
 
             if( tokenFile.exists() ){
                 System.out.println("FILE EXISTS");
@@ -62,18 +49,39 @@ public class GameClient {
 
                 String token = serverMessage.substring(serverMessage.indexOf(":") + 2);// parse token from text
                 userToken = UUID.fromString(token);
-                FileWriter fileWriter = new FileWriter( (userName + "token.txt") );
+                FileWriter fileWriter = new FileWriter(fileName);
                 fileWriter.write(token);
                 fileWriter.close();
                 System.out.println("Token stored to save file.");
             }
 
+            while (true){
+                
+                
+                int numberOfLines = Integer.parseInt(input.readLine());
+                if ( numberOfLines > 0 ){
+                    for (int i = 0; i < numberOfLines; i++) {
+                        String line = input.readLine();
+                        System.out.println(line);
+                    }
+                }else if ( numberOfLines == 0){
+                    System.out.println("send your answer");
+                    output.println(scanner.nextLine());
+                    System.out.println("answer sent");
+                }else{
+                    break;
+                }
+                
+                
+            }
+
+            input.close();
+            output.close();
+            socket.close();
+
             
             /*
-            output.println(scanner.nextLine());
-
-            serverMessage = input.readLine();
-            System.out.println(serverMessage);*/
+            */
 
             
  

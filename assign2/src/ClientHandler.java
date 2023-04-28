@@ -31,38 +31,50 @@ public class ClientHandler implements Runnable {
                 token = UUID.fromString(clientMessage);
                 username = server.getConnectedClients().get(token);
                 output.println("Authentication successful. Welcome back, " + username);
-                System.out.println("Authentication successful. Welcome back, " + username);
             } else {
                 username = clientMessage;
                 token = generateToken();
                 server.getConnectedClients().put(token, username);
                 output.println("Registration successful. Welcome, " + username + " : " + token.toString());
-                System.out.println("Registration successful. Welcome, " + username );
             }
 
 
             // Client Menu
-            /*while (true) {
-                output.println("Select an option:");
-                output.println("1. Find an opponent");
-                output.println("2. View waiting list");
-                output.println("3. Quit");
+            while(true){
+                output.println(4);//number of lines to follow
+                output.println("Select an option:\n" +
+                                "1. Find an opponent\n" +
+                                "2. View waiting list\n" +
+                                "3. Quit");
 
+                output.println(0);
                 String choice = input.readLine();
-                  
+                
+
                 if (choice.equals("1")) {
+                    output.println(1);
+                    output.println("You choose : 1. Find an opponent" );
                     //findOpponent();
                 } else if (choice.equals("2")) {
+                    output.println(1);
+                    output.println("You choose : 2. View waiting list" );
                     //viewWaitingList();
                 } else if (choice.equals("3")) {
-                    //quit();
+                    output.println(2);
+                    output.println("You choose : 3. Quit" );
+                    output.println("Closing connection. Goodbye " + username + "!");
+                    output.println(-1);
                     break;
+                    //quit();
                 } else {
+                    output.println(1);
                     output.println("Invalid choice. Please try again.");
                 }
-                System.out.println(input.readLine());
-            }*/
-
+                
+            
+            }
+            input.close();
+            output.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
