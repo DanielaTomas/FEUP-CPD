@@ -14,7 +14,6 @@ public class GameServer {
     private final ConcurrentHashMap<UUID, String> connectedClients;//second value is user token
     private final ConcurrentHashMap<UUID, Long> waitingClients;//second string is waiting time
     private final ConcurrentHashMap<UUID, Game> playingGames;//second item is game instance
-    private final static String USERS_FILE = "serverData.txt"; 
 
     public GameServer(int port, int maxGames) {
         this.port = port;

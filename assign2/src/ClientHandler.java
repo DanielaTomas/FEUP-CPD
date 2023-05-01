@@ -30,22 +30,31 @@ public class ClientHandler implements Runnable {
             String[] parts = response.split(":",2);//
             
             while(MessageType.valueOf(parts[0]) != MessageType.SUCCESS){
-                if (MessageType.valueOf(parts[0]) == MessageType.LOGIN && isValidToken(parts[1])) {
-                    token = UUID.fromString(parts[1]);
-                    username = server.getConnectedClients().get(token);
-    
-                    output.println(MessageType.AUTHENTICATION_SUCESS);
-                    break;
-                } else {
+                System.out.println(MessageType.valueOf(parts[0]));
+                if (MessageType.valueOf(parts[0]) == MessageType.LOGIN){
+                    if(isValidToken(parts[1])) {
+                        token = UUID.fromString(parts[1]);
+                        username = server.getConnectedClients().get(token);
+        
+                        output.println(MessageType.AUTHENTICATION_SUCESS);
+                        break;
+                    }else{
+                        output.println(MessageType.AUTHENTICATION_FAILURE);
+                    }
+                }else {
                     username = parts[1];
                     token = generateToken();
                     server.getConnectedClients().put(token, username);
+                    UserTokenFileHandler.addUserTokenPair(token, username);
     
                     output.println(MessageType.AUTHENTICATION_RESPONSE + ":" + token.toString());
-                    response = input.readLine();
-                    parts = response.split(":",2);
+
                 }
+                response = input.readLine();
+                parts = response.split(":",2);
             }
+
+            System.out.println("User " + username + " has connected to the server ");
 
             
 
@@ -88,15 +97,27 @@ public class ClientHandler implements Runnable {
     }
 
     private boolean isValidToken(String message) {
+        UUID tempToken;
+
         try {
-            UUID tempToken = UUID.fromString(message);
-            //if ( tempToken != null && server.getConnectedClients().containsKey(tempToken) ) return true;
-            
-            return true;
+            tempToken = UUID.fromString(message);
         } catch (IllegalArgumentException e) {
             // Handle the case where tempToken is not a valid UUID
+            System.out.println(e);
             return false;
         }
+        
+        if( tempToken != null ){
+            username = UserTokenFileHandler.getUsernameFromUUID(tempToken);
+            if (username != null){
+                server.getConnectedClients().put(tempToken,username);
+                return true;
+            } 
+        }
+
+            //if ( tempToken != null && server.getConnectedClients().containsKey(tempToken) ) return false;
+            
+            return false;
         
     }
 
