@@ -24,51 +24,56 @@ public class ClientHandler implements Runnable {
 
             // Client Authentication
 
-            output.println("Enter username:");
-            String clientMessage = input.readLine();
 
-            if (isValidToken(clientMessage)) {
-                token = UUID.fromString(clientMessage);
-                username = server.getConnectedClients().get(token);
-                output.println("Authentication successful. Welcome back, " + username);
-            } else {
-                username = clientMessage;
-                token = generateToken();
-                server.getConnectedClients().put(token, username);
-                output.println("Registration successful. Welcome, " + username + " : " + token.toString());
+            output.println(MessageType.WELCOME);
+            String response = input.readLine();
+            String[] parts = response.split(":",2);//
+            
+            while(MessageType.valueOf(parts[0]) != MessageType.SUCCESS){
+                if (MessageType.valueOf(parts[0]) == MessageType.LOGIN && isValidToken(parts[1])) {
+                    token = UUID.fromString(parts[1]);
+                    username = server.getConnectedClients().get(token);
+    
+                    output.println(MessageType.AUTHENTICATION_SUCESS);
+                    break;
+                } else {
+                    username = parts[1];
+                    token = generateToken();
+                    server.getConnectedClients().put(token, username);
+    
+                    output.println(MessageType.AUTHENTICATION_RESPONSE + ":" + token.toString());
+                }
             }
+
+            
 
 
             // Client Menu
             while(true){
-                output.println(4);//number of lines to follow
-                output.println("Select an option:\n" +
+                /*output.println("Select an option:\n" +
                                 "1. Find an opponent\n" +
-                                "2. View waiting list\n" +
-                                "3. Quit");
+                                "3. Quit");*/
+                output.println(MessageType.MAIN_MENU_PICK_OPTION);
 
-                output.println(0);
                 String choice = input.readLine();
+                MessageType message = MessageType.valueOf(choice);
                 
 
-                if (choice.equals("1")) {
-                    output.println(1);
-                    output.println("You choose : 1. Find an opponent" );
+                if (message == MessageType.MAIN_MENU_OPTION_FIND_GAME) {
+
+                    //output.println("You choose : 1. Find an opponent" );
                     //findOpponent();
-                } else if (choice.equals("2")) {
-                    output.println(1);
-                    output.println("You choose : 2. View waiting list" );
-                    //viewWaitingList();
-                } else if (choice.equals("3")) {
-                    output.println(2);
-                    output.println("You choose : 3. Quit" );
-                    output.println("Closing connection. Goodbye " + username + "!");
-                    output.println(-1);
+                }  else if (message == MessageType.QUIT) {
+
+                    //output.println("You choose : 2. Quit" );
+                    //output.println("Closing connection. Goodbye " + username + "!");
+                    input.close();
+                    output.close();
+                    socket.close();
                     break;
                     //quit();
                 } else {
-                    output.println(1);
-                    output.println("Invalid choice. Please try again.");
+                    output.println(MessageType.MAIN_MENU_INVALID_OPTION);
                 }
                 
             

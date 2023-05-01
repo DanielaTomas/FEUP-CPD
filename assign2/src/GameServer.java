@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+//########################################## NAO SE PODE USAR COISAS DO "java.util.concurrent"!!!!!!
 public class GameServer {
 
     private final int port;
