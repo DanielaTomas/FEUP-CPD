@@ -42,11 +42,12 @@ public class ClientHandler implements Runnable {
                     server.getConnectedClients().put(token, username);
     
                     output.println(MessageType.AUTHENTICATION_RESPONSE + ":" + token.toString());
+                    response = input.readLine();
+                    parts = response.split(":",2);
                 }
             }
 
             
-
 
             // Client Menu
             while(true){

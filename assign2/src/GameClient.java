@@ -26,13 +26,13 @@ public class GameClient {
                 BufferedReader reader = new BufferedReader(new FileReader(tokenFile)) ;
 
                 output.println(MessageType.LOGIN + ":" + reader.readLine());
-                
 
-                //reader.close();
+            }else{
+                System.out.println("No token found...");
+
+                output.println(MessageType.REGISTRATION + ":" +userName);//send username to server
             }
-            System.out.println("No token found...");
-
-            output.println(MessageType.REGISTRATION + ":" +userName);//send username to server
+            
         }catch(IOException e){
             System.out.println("I/O error: " + e.getMessage());
         }
@@ -99,6 +99,16 @@ public class GameClient {
                             System.out.println("Select an option:\n" +
                                                 "1. Find an opponent\n" +
                                                 "2. Quit");
+                            int option = scanner.nextInt();
+                            if (option == 1){
+                                output.println(MessageType.MAIN_MENU_OPTION_FIND_GAME);
+                            }else if (option == 2){
+                                output.println(MessageType.QUIT);
+                                output.close();
+                                input.close();
+                                scanner.close();
+                                socket.close();
+                            }
                             break;
                         default:
                             System.out.println("New message type detected: " + message);
