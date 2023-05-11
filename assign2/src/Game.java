@@ -58,8 +58,57 @@ public class Game {
             return response;
         }
 
+        // TODO: corrigir game loop quando a palavra tiver correta
+        public void gameLoop(String chosenWord, String shuffledWord) {
+            Game gameObject = new Game();
+
+            // TODO: APAGAR
+            Scanner myObj = new Scanner(System.in);
+
+            String guess = gameObject.convertToCapitalLetters(myObj.nextLine());
+            MessageType verifyGuess = gameObject.compareWords(guess, chosenWord);
+
+            while (verifyGuess != MessageType.CORRECT_GUESS){
+                System.out.println("Your guess: " + guess + " is wrong. Please try again in another round"); // TODO: Maybe Change
+                System.out.println("-------------------------------------------\n");
+                System.out.println("Shuffled word: " + shuffledWord);
+                guess = gameObject.convertToCapitalLetters(myObj.nextLine());
+            }
+
+            System.out.println("Game Finished");
+        }
+
+        public static void testPlayGame() {
+            Game gameObject = new Game();
+
+            // TODO: Find a better place to store the words 
+            List<String> words =new ArrayList<String>();  
+            words.add("FOOD");  
+            words.add("OI");  
+            words.add("DEPRESSION");  
+            words.add("COMPUTER");  
+
+
+            String chosenWord = gameObject.chooseWord(words, gameObject.random);
+            String shuffledWord = gameObject.shuffleWord(chosenWord, gameObject.random);
+
+            //System.out.println(chosenWord);
+            
+            System.out.println("-------------------------------------------\n");
+            System.out.println("Shuffled word: " + shuffledWord);
+
+            System.out.println("\n");
+            System.out.println("Enter your guesses:\n");
+
+            gameObject.gameLoop(chosenWord, shuffledWord);
+
+        }
+
+
+
+
         public static void main(String[] args) {
-            //testPlayGame();
+            testPlayGame();
         }
 
 }
