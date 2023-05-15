@@ -1,7 +1,5 @@
 import java.io.*;
 import java.util.*;
-
-// TODO: APAGAR
 import java.util.Scanner;
 
 
@@ -18,7 +16,7 @@ public class Game {
         }
 
 
-        // Convert all lettters in a client word guess to capital letters 
+        // Convert all lettters in the guessed to capital letters -> so that it is case insensitive 
         public String convertToCapitalLetters (String word) {
             return word.toUpperCase();
         }
@@ -38,6 +36,7 @@ public class Game {
 
             String resultWord = new String(letters); 
             
+            // For cases when the shuffled word is equals to the original word
             if (resultWord.equals(word)){
                 resultWord = shuffleWord(word, new Random());
             }
@@ -58,33 +57,34 @@ public class Game {
         public void gameLoop(String chosenWord, String shuffledWord) {
             Game gameObject = new Game();
 
-            // TODO: APAGAR
             Scanner myObj = new Scanner(System.in);
 
             String guess = gameObject.convertToCapitalLetters(myObj.nextLine());
             MessageType verifyGuess = gameObject.compareWords(guess, chosenWord);
 
             while (verifyGuess != MessageType.CORRECT_GUESS){
-                System.out.println("Your guess: " + guess + " is wrong. Please try again in another round. The correct word is " + chosenWord); // TODO: Maybe Change
-                System.out.println("-------------------------------------------\n");
-                System.out.println("Shuffled word: " + shuffledWord);
+                System.out.println("Your guess: " + guess + " is wrong. Please try again in another round.\n"); // TODO: Maybe Change
+                System.out.println("-------------------------------------------");
+                System.out.println("Guess the word: " + shuffledWord);
                 guess = gameObject.convertToCapitalLetters(myObj.nextLine());
                 verifyGuess = gameObject.compareWords(guess, chosenWord);
             }
 
-            System.out.println("Game Finished");
+            System.out.println("Correct word! Game Finished!\n");
         }
 
+        // TODO: Change function name when it is fully implemented 
         public static void testPlayGame() {
             Game gameObject = new Game();
 
-            // TODO: Find a better place to store the words 
+            // TODO: Find a better place to store the words, maybe 
             List<String> words =new ArrayList<String>();  
-            //words.add("FOOD");
-            words.add("OI"); 
-            words.add("ANA");   
-            //words.add("DEPRESSION");  
-            //words.add("COMPUTER");  
+            words.add("FOOD");
+            words.add("DEPRESSION");  
+            words.add("COMPUTER");  
+            words.add("CRINGE");  
+            words.add("GUESS");
+            words.add("WORD");
 
 
             String chosenWord = gameObject.chooseWord(words, gameObject.random);
@@ -92,17 +92,13 @@ public class Game {
 
             //System.out.println(chosenWord);
             
-            System.out.println("-------------------------------------------\n");
+            System.out.println("-------------------------------------------");
             System.out.println("Shuffled word: " + shuffledWord);
-
-            System.out.println("\n");
-            System.out.println("Enter your guesses:\n");
+            System.out.println("Enter your guesses: "); // TODO: Maybe change when every client has to guess
 
             gameObject.gameLoop(chosenWord, shuffledWord);
 
         }
-
-
 
 
         public static void main(String[] args) {

@@ -11,6 +11,8 @@ public class GameClient {
     String hostname;
     int port;
 
+    Game game;
+
     public GameClient(String hostname, int port){
         this.hostname = hostname;
         this.port = port;
@@ -98,7 +100,8 @@ public class GameClient {
                         case MAIN_MENU_PICK_OPTION:
                             System.out.println("Select an option:\n" +
                                                 "1. Find an opponent\n" +
-                                                "2. Quit");
+                                                "2. Quit\n" +
+                                                "3. Play Alone" );
                             int option = scanner.nextInt();
                             if (option == 1){
                                 output.println(MessageType.MAIN_MENU_OPTION_FIND_GAME);
@@ -108,6 +111,9 @@ public class GameClient {
                                 input.close();
                                 scanner.close();
                                 socket.close();
+                            } else if (option == 3){
+                                game.testPlayGame();
+                                output.println(MessageType.MAIN_MENU_OPTION_FIND_GAME);
                             }
                             break;
                         default:
