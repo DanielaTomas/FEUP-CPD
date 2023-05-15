@@ -38,9 +38,8 @@ public class Game {
 
             String resultWord = new String(letters); 
             
-            // TODO: For cases where the resulting shuffled word is equal to the one given, not working
-            if (resultWord == word){
-                shuffleWord(word, new Random());
+            if (resultWord.equals(word)){
+                resultWord = shuffleWord(word, new Random());
             }
 
             return resultWord;
@@ -81,10 +80,11 @@ public class Game {
 
             // TODO: Find a better place to store the words 
             List<String> words =new ArrayList<String>();  
-            words.add("FOOD");  
-            words.add("OI");  
-            words.add("DEPRESSION");  
-            words.add("COMPUTER");  
+            //words.add("FOOD");
+            words.add("OI"); 
+            words.add("ANA");   
+            //words.add("DEPRESSION");  
+            //words.add("COMPUTER");  
 
 
             String chosenWord = gameObject.chooseWord(words, gameObject.random);
