@@ -8,8 +8,6 @@ import java.util.Scanner;
 public class Game {
 
         Random random = new Random();
-        
-
 
         // Choose a random word from the list of words
         public String chooseWord(List<String> words, Random random) { 
@@ -40,7 +38,7 @@ public class Game {
 
             String resultWord = new String(letters); 
             
-            // TODO: For cases where the resulting word is equal to ther one given, not working  
+            // TODO: For cases where the resulting shuffled word is equal to the one given, not working
             if (resultWord == word){
                 shuffleWord(word, new Random());
             }
@@ -50,7 +48,7 @@ public class Game {
 
         public MessageType compareWords(String guess, String correctWord){
             MessageType response;
-            if (guess == correctWord){
+            if (guess.equals(correctWord)){
                 response = MessageType.CORRECT_GUESS;
             } else {
                 response = MessageType.INCORRECT_GUESS;
@@ -58,7 +56,6 @@ public class Game {
             return response;
         }
 
-        // TODO: corrigir game loop quando a palavra tiver correta
         public void gameLoop(String chosenWord, String shuffledWord) {
             Game gameObject = new Game();
 
@@ -69,10 +66,11 @@ public class Game {
             MessageType verifyGuess = gameObject.compareWords(guess, chosenWord);
 
             while (verifyGuess != MessageType.CORRECT_GUESS){
-                System.out.println("Your guess: " + guess + " is wrong. Please try again in another round"); // TODO: Maybe Change
+                System.out.println("Your guess: " + guess + " is wrong. Please try again in another round. The correct word is " + chosenWord); // TODO: Maybe Change
                 System.out.println("-------------------------------------------\n");
                 System.out.println("Shuffled word: " + shuffledWord);
                 guess = gameObject.convertToCapitalLetters(myObj.nextLine());
+                verifyGuess = gameObject.compareWords(guess, chosenWord);
             }
 
             System.out.println("Game Finished");
