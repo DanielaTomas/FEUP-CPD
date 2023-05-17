@@ -104,7 +104,7 @@ public class GameClient {
                                                 "3. Play Alone" );
                             int option = scanner.nextInt();
                             if (option == 1){
-                                output.println(MessageType.MAIN_MENU_OPTION_FIND_GAME);
+                                output.println(MessageType.JOIN_QUEUE);
                             }else if (option == 2){
                                 output.println(MessageType.QUIT);
                                 output.close();
@@ -113,7 +113,7 @@ public class GameClient {
                                 socket.close();
                             } else if (option == 3){
                                 game.testPlayGame();
-                                output.println(MessageType.MAIN_MENU_OPTION_FIND_GAME);
+                                output.println(MessageType.JOIN_QUEUE);
                             }
                             break;
                         default:

@@ -10,6 +10,7 @@ public class ClientHandler implements Runnable {
     private PrintWriter output;
     private String username;
     private UUID token;
+    //private User user; unused for now, as not all of the needed values are available at start time
 
     public ClientHandler(Socket socket,GameServer server) {
         this.socket = socket;
@@ -69,8 +70,8 @@ public class ClientHandler implements Runnable {
                 MessageType message = MessageType.valueOf(choice);
                 
 
-                if (message == MessageType.MAIN_MENU_OPTION_FIND_GAME) {
-
+                if (message == MessageType.JOIN_QUEUE) {
+                    if (server.handleJoinQueue(new User(socket, token, username, 0))) break;//break out of loop if client join wait queue
                     //output.println("You choose : 1. Find an opponent" );
                     //findOpponent();
                 }  else if (message == MessageType.QUIT) {
@@ -90,7 +91,7 @@ public class ClientHandler implements Runnable {
             }
             input.close();
             output.close();
-            socket.close();
+            //socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -115,9 +116,9 @@ public class ClientHandler implements Runnable {
             } 
         }
 
-            //if ( tempToken != null && server.getConnectedClients().containsKey(tempToken) ) return false;
-            
-            return false;
+        //if ( tempToken != null && server.getConnectedClients().containsKey(tempToken) ) return false;
+        
+        return false;
         
     }
 

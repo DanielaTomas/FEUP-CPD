@@ -1,11 +1,30 @@
 import java.io.*;
 import java.util.*;
+import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 
-public class Game {
-
+public class Game implements Runnable {
+        private final HashMap<User, Integer> playingClients = new HashMap<>();//Integer represents score in current instance
         Random random = new Random();
+
+        public void addPlayer(User user){
+            playingClients.put(user,0);
+        }
+
+        @Override
+        public void run() {
+            System.out.println("Running game instance");
+            for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
+                User key = entry.getKey();
+                Integer value = entry.getValue();
+                System.out.println("Key: " + key.getName() + ", Value: " + value);
+            }
+
+            //testPlayGame();
+        }
+        
 
         // Choose a random word from the list of words
         public String chooseWord(List<String> words, Random random) { 
@@ -100,9 +119,8 @@ public class Game {
 
         }
 
-
-        public static void main(String[] args) {
+        /*public static void main(String[] args) {
             testPlayGame();
-        }
+        }*/
 
 }
