@@ -7,20 +7,100 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Game implements Runnable {
         private final HashMap<User, Integer> playingClients = new HashMap<>();//Integer represents score in current instance
+        private GameServer server;
+        private BufferedReader input;
+        private PrintWriter output;
+        List<String> words =new ArrayList<String>();  
         Random random = new Random();
 
         public void addPlayer(User user){
             playingClients.put(user,0);
         }
 
+        public void sendMessageToPlayer(User user, String message) {
+            Socket playerSocket = user.getSocket();
+            if (playerSocket != null) {
+                try {
+                    PrintWriter out = new PrintWriter(playerSocket.getOutputStream(), true);
+                    out.println(message);
+                } catch (IOException e) {
+                    System.out.println("Error sending message to player " +  user.getName() + ": " + e.getMessage());
+                }
+            } else {
+                System.out.println("Player " + user.getName() + " is not connected.");
+            }
+        }
+
+        public void broadcastMessage(String message) {
+            for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {//key is a user value is score
+                try {
+                    User user = entry.getKey();
+                    Integer userScore = entry.getValue();
+                    //System.out.println("Key: " + user.getName() + ", Value: " + value);
+                    PrintWriter out = new PrintWriter(user.getSocket().getOutputStream(), true);
+                    out.println(message);
+                } catch (IOException e) {
+                    // Handle any errors that may occur during communication
+                    System.out.println("Error sending message to player : " + entry.getKey().getName() + " error:" + e.getMessage());
+                }
+            }
+        }
+
+        public void testPlayGameMultiplayer(){
+            //Game gameObject = new Game();
+
+            // TODO: Find a better place to store the words, maybe 
+            words.add("FOOD");
+            words.add("DEPRESSION");  
+            words.add("COMPUTER");  
+            words.add("CRINGE");  
+            words.add("GUESS");
+            words.add("WORD");
+            
+
+            //System.out.println(chosenWord);
+            
+
+            this.onlineGameLoop();
+        }
+
+        public void onlineGameLoop() {
+            String chosenWord = this.chooseWord(words, this.random);
+            String shuffledWord = this.shuffleWord(chosenWord, this.random);
+            this.broadcastMessage(MessageType.WORD_TO_GUESS+":"+shuffledWord);
+            
+            for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
+                User user = entry.getKey();
+                Integer userScore = entry.getValue();
+
+            }
+
+            Scanner scanner = new Scanner(System.in);
+
+            String guess = this.convertToCapitalLetters(scanner.nextLine());
+            MessageType verifyGuess = this.compareWords(guess, chosenWord);
+
+            while (verifyGuess != MessageType.CORRECT_GUESS){//TODO CONTINUE HERE
+                /*System.out.println("Your guess: " + guess + " is wrong. Please try again in another round.\n"); // TODO: Maybe Change
+                System.out.println("-------------------------------------------");
+                System.out.println("Guess the word: " + shuffledWord);*/
+                guess = this.convertToCapitalLetters(scanner.nextLine());
+                verifyGuess = this.compareWords(guess, chosenWord);
+            }
+
+            System.out.println("Correct word! Game Finished!\n");
+        }
+        
+
         @Override
         public void run() {
             System.out.println("Running game instance");
             for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
-                User key = entry.getKey();
+                User user = entry.getKey();
                 Integer value = entry.getValue();
-                System.out.println("Key: " + key.getName() + ", Value: " + value);
+                System.out.println("Key: " + user.getName() + ", Value: " + value);
             }
+            
 
             //testPlayGame();
         }

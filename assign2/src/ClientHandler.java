@@ -71,10 +71,13 @@ public class ClientHandler implements Runnable {
                 
 
                 if (message == MessageType.JOIN_QUEUE) {
-                    if (server.handleJoinQueue(new User(socket, token, username, 0))) break;//break out of loop if client join wait queue
+                    if (server.handleJoinQueue(new User(socket, token, username, 0))){//break out of loop if client join wait queue
+                        output.println(MessageType.QUEUE_JOIN_SUCESS);
+                        break;
+                    } 
                     //output.println("You choose : 1. Find an opponent" );
                     //findOpponent();
-                }  else if (message == MessageType.QUIT) {
+                }else if (message == MessageType.QUIT) {
 
                     //output.println("You choose : 2. Quit" );
                     //output.println("Closing connection. Goodbye " + username + "!");
@@ -83,7 +86,7 @@ public class ClientHandler implements Runnable {
                     socket.close();
                     break;
                     //quit();
-                } else {
+                }else {
                     output.println(MessageType.MAIN_MENU_INVALID_OPTION);
                 }
                 

@@ -74,6 +74,8 @@ public class GameClient {
                     if (parts.length ==2){
                         messageContent = parts[1];
                     }
+                    
+                    //if (message == MessageType.QUEUE_JOIN_SUCESS) break;
 
                     switch (message){
                         case WELCOME:
@@ -111,10 +113,16 @@ public class GameClient {
                                 input.close();
                                 scanner.close();
                                 socket.close();
-                            } else if (option == 3){
+                            } else if (option == 3){//SINGLE PLAYER
                                 game.testPlayGame();
-                                output.println(MessageType.JOIN_QUEUE);
+                                //output.println(MessageType.JOIN_QUEUE);
                             }
+                            break;
+                        case QUEUE_JOIN_SUCESS:
+                            System.out.println("Joined Queue, there are currently: " + messageContent + " players in the queue");
+                            break;
+                        case GAME_START:
+                            this.interfaceWithGame(socket);
                             break;
                         default:
                             System.out.println("New message type detected: " + message);
@@ -137,6 +145,45 @@ public class GameClient {
             output.close();
             //socket.close();
         }
+    }
+
+    public void interfaceWithGame(Socket socket){
+        Scanner scanner = new Scanner(System.in);
+ 
+        try {
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+            String serverMessage;
+            String fileName;
+            File tokenFile;
+            int score;
+
+            System.out.println("Game Starting!");
+            System.out.println("-------------------------------------------");
+
+            while (true){//TODO: CONTINUE HERE
+                String response = input.readLine();
+                String messageContent = null;
+                if(response != null){
+                    String[] parts = response.split(":",2);
+                    MessageType message = MessageType.valueOf(parts[0]);
+                    if (parts.length ==2){
+                        messageContent = parts[1];
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            System.out.println("I/O error: " + ex.getMessage());
+        }finally{
+            scanner.close();
+            //input.close();
+            output.close();
+            //socket.close();
+            System.out.println("Game Over!");
+            System.out.println("Going back to the menu...");
+            System.out.println("-------------------------------------------");
+        }
+                    
     }
 
     public static void main(String[] args) throws Exception {

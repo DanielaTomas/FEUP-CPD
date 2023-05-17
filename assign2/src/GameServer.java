@@ -11,17 +11,17 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class GameServer {
 
     private final int port;
-    private final int maxGames;
+    private final int maxThreads;
     private final ThreadPoolExecutor gameThreadPool;
     private final ConcurrentHashMap<UUID, String> connectedClients;//second value is user token
     //private final ConcurrentHashMap<UUID, Socket> waitingClients;//second string is socket user is connected to
     private final ConcurrentLinkedQueue<User> waitQueue;
     private final ConcurrentHashMap<UUID, Game> playingGames;//second item is game instance
 
-    public GameServer(int port, int maxGames) {
+    public GameServer(int port, int maxThreads) {
         this.port = port;
-        this.maxGames = maxGames;
-        this.gameThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxGames);
+        this.maxThreads = maxThreads;
+        this.gameThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
         this.connectedClients = new ConcurrentHashMap<>();
         //this.waitingClients = new ConcurrentHashMap<>();
         this.playingGames = new ConcurrentHashMap<>();
@@ -92,9 +92,9 @@ public class GameServer {
 
     public static void main(String[] args) {
         int port = 8080;
-        int maxGames = 10;
+        int maxThreads = 10;
 
-        GameServer server = new GameServer(port, maxGames);
+        GameServer server = new GameServer(port, maxThreads);
         server.start();
     }
 
