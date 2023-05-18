@@ -176,11 +176,21 @@ public class GameClient {
                         case WORD_TO_GUESS:
                             System.out.println("Shuffled word: " + messageContent);
                             System.out.println("Enter your guess: ");
+                            String guessString  = scanner.nextLine();
+                            output.println(MessageType.GUESS_ATTEMPT + ":" + guessString);
                             break;
-                            }
+                        case CORRECT_GUESS:
+                            System.out.println("You guessed correctly!");
+                            break;
+                        case INCORRECT_GUESS:
+                            System.out.println("Wrong! You guessed incorrectly...");
+                            System.out.println("The correct word was:" + messageContent);
+                            break;
+                        }
+                    }
                 }
-            }
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println("I/O error: " + ex.getMessage());
         }finally{
             scanner.close();

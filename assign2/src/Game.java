@@ -3,13 +3,15 @@ import java.util.*;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class Game implements Runnable {
         private final HashMap<User, Integer> playingClients = new HashMap<>();//Integer represents score in current instance
         private GameServer server;
-        private BufferedReader input;
-        private PrintWriter output;
+        //private BufferedReader input;
+        //private PrintWriter output;
         List<String> words =new ArrayList<String>();  
         Random random = new Random();
 
@@ -21,9 +23,10 @@ public class Game implements Runnable {
             Socket playerSocket = user.getSocket();
             if (playerSocket != null) {
                 try {
-                    PrintWriter out = new PrintWriter(playerSocket.getOutputStream(), true);
-                    if (messageContent != null) out.println(messageType + ":" + messageContent);
-                    else out.println(messageType);
+                    PrintWriter output = new PrintWriter(playerSocket.getOutputStream(), true);
+                    System.out.println("Sending single message to : " + user.getName() );
+                    if (messageContent != null) output.println(messageType + ":" + messageContent);
+                    else output.println(messageType);
                 } catch (IOException e) {
                     System.out.println("Error sending message to player " +  user.getName() + ": " + e.getMessage());
                 }
@@ -37,10 +40,10 @@ public class Game implements Runnable {
                 try {
                     User user = entry.getKey();
                     Integer userScore = entry.getValue();
-                    System.out.println("Sending message to : " + user.getName() );
-                    PrintWriter out = new PrintWriter(user.getSocket().getOutputStream(), true);
-                    if (messageContent != null) out.println(messageType + ":" + messageContent);
-                    else out.println(messageType);
+                    System.out.println("Sending broadcast message to : " + user.getName() );
+                    PrintWriter output = new PrintWriter(user.getSocket().getOutputStream(), true);
+                    if (messageContent != null) output.println(messageType + ":" + messageContent);
+                    else output.println(messageType);
                 } catch (IOException e) {
                     // Handle any errors that may occur during communication
                     System.out.println("Error sending message to player : " + entry.getKey().getName() + "  while broadcasting, error:" + e.getMessage());
@@ -80,7 +83,43 @@ public class Game implements Runnable {
 
             this.broadcastMessage(MessageType.WORD_TO_GUESS, shuffledWord);
 
+            try {
+                ExecutorService executorService = Executors.newFixedThreadPool(playingClients.size());
             
+                for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
+                    executorService.execute(() -> {
+                        try {
+                            User user = entry.getKey();
+                            Socket socket = user.getSocket();
+            
+                            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                            PrintWriter output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+            
+                            String response = input.readLine();
+                            String messageContent = null;
+                            if (response != null) {
+                                String[] parts = response.split(":", 2);
+                                MessageType message = MessageType.valueOf(parts[0]);
+                                if (parts.length == 2) {
+                                    messageContent = parts[1];
+                                }
+                                
+                                if (message == MessageType.GUESS_ATTEMPT){
+                                    String guessAttempt = this.convertToCapitalLetters(messageContent);
+                                    MessageType verifyGuess = this.compareWords(guessAttempt, chosenWord);
+                                    this.sendMessageToPlayer(user, verifyGuess, chosenWord);
+                                }
+            
+                                
+                            }
+                        } catch (IOException e) {
+                            System.out.println("Error on game loop: " + e.getMessage());
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                System.out.println("Error start game outside for: " + e.getMessage());
+            }
 
             /*Scanner scanner = new Scanner(System.in);
 
