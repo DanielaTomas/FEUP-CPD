@@ -158,6 +158,7 @@ public class GameClient {
             File tokenFile;
             int score;
 
+            System.out.println("-------------------------------------------");
             System.out.println("Game Starting!");
             System.out.println("-------------------------------------------");
 
@@ -170,6 +171,13 @@ public class GameClient {
                     if (parts.length ==2){
                         messageContent = parts[1];
                     }
+
+                     switch (message){
+                        case WORD_TO_GUESS:
+                            System.out.println("Shuffled word: " + messageContent);
+                            System.out.println("Enter your guess: ");
+                            break;
+                            }
                 }
             }
         } catch (IOException ex) {

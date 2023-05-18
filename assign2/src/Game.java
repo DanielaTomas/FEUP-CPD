@@ -17,12 +17,13 @@ public class Game implements Runnable {
             playingClients.put(user,0);
         }
 
-        public void sendMessageToPlayer(User user, String message) {
+        public void sendMessageToPlayer(User user,MessageType messageType, String messageContent) {
             Socket playerSocket = user.getSocket();
             if (playerSocket != null) {
                 try {
                     PrintWriter out = new PrintWriter(playerSocket.getOutputStream(), true);
-                    out.println(message);
+                    if (messageContent != null) out.println(messageType + ":" + messageContent);
+                    else out.println(messageType);
                 } catch (IOException e) {
                     System.out.println("Error sending message to player " +  user.getName() + ": " + e.getMessage());
                 }
@@ -31,17 +32,18 @@ public class Game implements Runnable {
             }
         }
 
-        public void broadcastMessage(String message) {
+        public void broadcastMessage(MessageType messageType, String messageContent) {
             for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {//key is a user value is score
                 try {
                     User user = entry.getKey();
                     Integer userScore = entry.getValue();
-                    //System.out.println("Key: " + user.getName() + ", Value: " + value);
+                    System.out.println("Sending message to : " + user.getName() );
                     PrintWriter out = new PrintWriter(user.getSocket().getOutputStream(), true);
-                    out.println(message);
+                    if (messageContent != null) out.println(messageType + ":" + messageContent);
+                    else out.println(messageType);
                 } catch (IOException e) {
                     // Handle any errors that may occur during communication
-                    System.out.println("Error sending message to player : " + entry.getKey().getName() + " error:" + e.getMessage());
+                    System.out.println("Error sending message to player : " + entry.getKey().getName() + "  while broadcasting, error:" + e.getMessage());
                 }
             }
         }
@@ -67,7 +69,8 @@ public class Game implements Runnable {
         public void onlineGameLoop() {
             String chosenWord = this.chooseWord(words, this.random);
             String shuffledWord = this.shuffleWord(chosenWord, this.random);
-            this.broadcastMessage(MessageType.WORD_TO_GUESS+":"+shuffledWord);
+            this.broadcastMessage(MessageType.GAME_START,null);
+            //this.broadcastMessage(MessageType.WORD_TO_GUESS , shuffledWord);
             
             for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
                 User user = entry.getKey();
@@ -75,20 +78,26 @@ public class Game implements Runnable {
 
             }
 
-            Scanner scanner = new Scanner(System.in);
+            this.broadcastMessage(MessageType.WORD_TO_GUESS, shuffledWord);
+
+            
+
+            /*Scanner scanner = new Scanner(System.in);
+
+
 
             String guess = this.convertToCapitalLetters(scanner.nextLine());
-            MessageType verifyGuess = this.compareWords(guess, chosenWord);
+            MessageType verifyGuess = this.compareWords(guess, chosenWord);*/
 
-            while (verifyGuess != MessageType.CORRECT_GUESS){//TODO CONTINUE HERE
+            /*while (verifyGuess != MessageType.CORRECT_GUESS){//TODO CONTINUE HERE
                 /*System.out.println("Your guess: " + guess + " is wrong. Please try again in another round.\n"); // TODO: Maybe Change
                 System.out.println("-------------------------------------------");
                 System.out.println("Guess the word: " + shuffledWord);*/
-                guess = this.convertToCapitalLetters(scanner.nextLine());
+                /*guess = this.convertToCapitalLetters(scanner.nextLine());
                 verifyGuess = this.compareWords(guess, chosenWord);
             }
 
-            System.out.println("Correct word! Game Finished!\n");
+            System.out.println("Correct word! Game Finished!\n");*/
         }
         
 
@@ -100,6 +109,8 @@ public class Game implements Runnable {
                 Integer value = entry.getValue();
                 System.out.println("Key: " + user.getName() + ", Value: " + value);
             }
+
+            this.testPlayGameMultiplayer();
             
 
             //testPlayGame();

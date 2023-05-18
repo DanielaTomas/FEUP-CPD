@@ -72,7 +72,7 @@ public class ClientHandler implements Runnable {
 
                 if (message == MessageType.JOIN_QUEUE) {
                     if (server.handleJoinQueue(new User(socket, token, username, 0))){//break out of loop if client join wait queue
-                        output.println(MessageType.QUEUE_JOIN_SUCESS);
+                        output.println(MessageType.QUEUE_JOIN_SUCESS+":"+server.getWaitingClients().size());
                         break;
                     } 
                     //output.println("You choose : 1. Find an opponent" );
@@ -92,8 +92,8 @@ public class ClientHandler implements Runnable {
                 
             
             }
-            input.close();
-            output.close();
+            //input.close();
+            //output.close();
             //socket.close();
         } catch (IOException e) {
             e.printStackTrace();

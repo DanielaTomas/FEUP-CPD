@@ -41,11 +41,11 @@ public class GameServer {
                     ClientHandler handler = new ClientHandler(socket,this);
                     gameThreadPool.execute(handler);
                 }catch  (SocketTimeoutException ignored) {
-                    System.out.println("hihi");
+                    System.out.println("ping");
                 }
                 
 
-                if (waitQueue.size() >= 3) {
+                if (waitQueue.size() >= 2) {
                     System.out.println("Attempting ");
                     this.startGame();
                 }
@@ -60,7 +60,7 @@ public class GameServer {
     private void startGame(){
         Game gameInstance = new Game();
 
-        for(int i = 0; i < waitQueue.size() || i < 3; i++){
+        for(int i = 0; i < waitQueue.size() || i < 2; i++){
             User currUser = waitQueue.poll();
             System.out.println("adding " + currUser.getName() + " to a game instance");
             gameInstance.addPlayer(currUser);
@@ -82,9 +82,9 @@ public class GameServer {
         return connectedClients;
     }
 
-    /*public ConcurrentHashMap<UUID, Socket> getWaitingClients(){
-        return waitingClients;
-    }*/
+    public ConcurrentLinkedQueue<User> getWaitingClients(){
+        return waitQueue;
+    }
 
     public ConcurrentHashMap<UUID, Game> getPlayingGames(){//TODO: do we really need this
         return playingGames;
