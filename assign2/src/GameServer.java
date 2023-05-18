@@ -28,6 +28,12 @@ public class GameServer {
         this.waitQueue = new ConcurrentLinkedQueue<>();
     }
 
+    public void sendToMenu(User user){
+        ClientHandler handler = new ClientHandler(user, this);
+        gameThreadPool.execute(handler);
+        System.out.println("Sending :" + user.getName() + " back to the main menu");
+    }
+
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             serverSocket.setSoTimeout(5000);
@@ -58,7 +64,7 @@ public class GameServer {
     }
 
     private void startGame(){
-        Game gameInstance = new Game();
+        Game gameInstance = new Game(this);
 
         for(int i = 0; i < waitQueue.size() || i < 2; i++){
             User currUser = waitQueue.poll();
@@ -73,6 +79,7 @@ public class GameServer {
     public boolean handleJoinQueue(User user){
         if (!waitQueue.contains(user)) {
             waitQueue.add(user);
+            System.out.println("Added " + user.getName() + " to queue! ");
             return true;
         }
         return false;

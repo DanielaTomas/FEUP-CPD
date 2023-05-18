@@ -3,8 +3,10 @@ import java.util.*;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class Game implements Runnable {
@@ -14,6 +16,12 @@ public class Game implements Runnable {
         //private PrintWriter output;
         List<String> words =new ArrayList<String>();  
         Random random = new Random();
+
+        private Game(){}
+
+        public Game (GameServer gameServer){
+            this.server = gameServer;
+        }
 
         public void addPlayer(User user){
             playingClients.put(user,0);
@@ -66,26 +74,35 @@ public class Game implements Runnable {
             //System.out.println(chosenWord);
             
 
-            this.onlineGameLoop();
+            for(int i = 0; i < 2; i++) this.onlineGameLoop();
+
+            this.broadcastMessage(MessageType.GAME_OVER, null);
+
+            for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
+                this.server.sendToMenu(entry.getKey());
+            }
+
+             //CRIAR CLIENT HANDLER AQUI
+
+            //this.broadcastMessage(MessageType.MAIN_MENU_PICK_OPTION, null);
+
         }
 
-        public void onlineGameLoop() {
+        public void onlineGameLoop() {//TODO:jogo esta a enviar mensagem do tipo CORRECT OU INCORRECT depois de voltar para o main menu
             String chosenWord = this.chooseWord(words, this.random);
             String shuffledWord = this.shuffleWord(chosenWord, this.random);
             this.broadcastMessage(MessageType.GAME_START,null);
             //this.broadcastMessage(MessageType.WORD_TO_GUESS , shuffledWord);
             
-            for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
+            /*for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
                 User user = entry.getKey();
                 Integer userScore = entry.getValue();
-
-            }
+            }*/
 
             this.broadcastMessage(MessageType.WORD_TO_GUESS, shuffledWord);
-
+            ExecutorService executorService = Executors.newFixedThreadPool(playingClients.size());
+            CountDownLatch answerLatch = new CountDownLatch(playingClients.size());
             try {
-                ExecutorService executorService = Executors.newFixedThreadPool(playingClients.size());
-            
                 for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {
                     executorService.execute(() -> {
                         try {
@@ -109,6 +126,8 @@ public class Game implements Runnable {
                                     MessageType verifyGuess = this.compareWords(guessAttempt, chosenWord);
                                     this.sendMessageToPlayer(user, verifyGuess, chosenWord);
                                 }
+
+                                answerLatch.countDown();
             
                                 
                             }
@@ -121,22 +140,21 @@ public class Game implements Runnable {
                 System.out.println("Error start game outside for: " + e.getMessage());
             }
 
-            /*Scanner scanner = new Scanner(System.in);
+            executorService.shutdown();
 
-
-
-            String guess = this.convertToCapitalLetters(scanner.nextLine());
-            MessageType verifyGuess = this.compareWords(guess, chosenWord);*/
-
-            /*while (verifyGuess != MessageType.CORRECT_GUESS){//TODO CONTINUE HERE
-                /*System.out.println("Your guess: " + guess + " is wrong. Please try again in another round.\n"); // TODO: Maybe Change
-                System.out.println("-------------------------------------------");
-                System.out.println("Guess the word: " + shuffledWord);*/
-                /*guess = this.convertToCapitalLetters(scanner.nextLine());
-                verifyGuess = this.compareWords(guess, chosenWord);
+            try {
+                // Wait for all threads to finish 
+                boolean allAnswered  = answerLatch.await(30, TimeUnit.SECONDS);
+                if (!allAnswered ) {
+                    // Timeout occurred, handle the situation accordingly
+                    System.out.println("Timeout: Some players have not given their answers.");
+                }else{
+                    System.out.println("All players have given their answers.");
+                }
+            } catch (InterruptedException e) {
+                System.out.println("Error waiting for game loop to finish: " + e.getMessage());
             }
 
-            System.out.println("Correct word! Game Finished!\n");*/
         }
         
 

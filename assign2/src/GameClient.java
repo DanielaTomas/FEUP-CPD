@@ -74,7 +74,8 @@ public class GameClient {
                     if (parts.length ==2){
                         messageContent = parts[1];
                     }
-                    
+
+                                        
                     //if (message == MessageType.QUEUE_JOIN_SUCESS) break;
 
                     switch (message){
@@ -172,6 +173,8 @@ public class GameClient {
                         messageContent = parts[1];
                     }
 
+                    if (message == MessageType.GAME_OVER) break;
+
                      switch (message){
                         case WORD_TO_GUESS:
                             System.out.println("Shuffled word: " + messageContent);
@@ -188,14 +191,15 @@ public class GameClient {
                             break;
                         }
                     }
+                    
                 }
         }
         catch (IOException ex) {
             System.out.println("I/O error: " + ex.getMessage());
         }finally{
-            scanner.close();
+            //scanner.close();
             //input.close();
-            output.close();
+            //output.close();
             //socket.close();
             System.out.println("Game Over!");
             System.out.println("Going back to the menu...");

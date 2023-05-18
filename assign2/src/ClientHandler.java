@@ -10,11 +10,20 @@ public class ClientHandler implements Runnable {
     private PrintWriter output;
     private String username;
     private UUID token;
-    //private User user; unused for now, as not all of the needed values are available at start time
+    private User user;// used only when all user info is set -> after login/registration
 
     public ClientHandler(Socket socket,GameServer server) {
         this.socket = socket;
         this.server = server;
+        this.user = null;
+    }
+
+    public ClientHandler(User user,GameServer server) {
+        this.user = user;
+        this.server = server;
+        this.socket = user.getSocket();
+        this.username = user.getName();
+        this.token = user.getUuid();
     }
 
     @Override
@@ -23,80 +32,76 @@ public class ClientHandler implements Runnable {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
 
-            // Client Authentication
+            while (user == null) this.authenticateUser();
 
+            this.menu();
 
-            output.println(MessageType.WELCOME);
-            String response = input.readLine();
-            String[] parts = response.split(":",2);//
-            
-            while(MessageType.valueOf(parts[0]) != MessageType.SUCCESS){
-                System.out.println(MessageType.valueOf(parts[0]));
-                if (MessageType.valueOf(parts[0]) == MessageType.LOGIN){
-                    if(isValidToken(parts[1])) {
-                        token = UUID.fromString(parts[1]);
-                        username = server.getConnectedClients().get(token);
-        
-                        output.println(MessageType.AUTHENTICATION_SUCESS);
-                        break;
-                    }else{
-                        output.println(MessageType.AUTHENTICATION_FAILURE);
-                    }
-                }else {
-                    username = parts[1];
-                    token = generateToken();
-                    server.getConnectedClients().put(token, username);
-                    UserTokenFileHandler.addUserTokenPair(token, username);
-    
-                    output.println(MessageType.AUTHENTICATION_RESPONSE + ":" + token.toString());
-
-                }
-                response = input.readLine();
-                parts = response.split(":",2);
-            }
-
-            System.out.println("User " + username + " has connected to the server ");
-
-            
-
-            // Client Menu
-            while(true){
-                /*output.println("Select an option:\n" +
-                                "1. Find an opponent\n" +
-                                "3. Quit");*/
-                output.println(MessageType.MAIN_MENU_PICK_OPTION);
-
-                String choice = input.readLine();
-                MessageType message = MessageType.valueOf(choice);
-                
-
-                if (message == MessageType.JOIN_QUEUE) {
-                    if (server.handleJoinQueue(new User(socket, token, username, 0))){//break out of loop if client join wait queue
-                        output.println(MessageType.QUEUE_JOIN_SUCESS+":"+server.getWaitingClients().size());
-                        break;
-                    } 
-                    //output.println("You choose : 1. Find an opponent" );
-                    //findOpponent();
-                }else if (message == MessageType.QUIT) {
-
-                    //output.println("You choose : 2. Quit" );
-                    //output.println("Closing connection. Goodbye " + username + "!");
-                    input.close();
-                    output.close();
-                    socket.close();
-                    break;
-                    //quit();
-                }else {
-                    output.println(MessageType.MAIN_MENU_INVALID_OPTION);
-                }
-                
-            
-            }
             //input.close();
             //output.close();
             //socket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void authenticateUser() throws IOException{
+
+        output.println(MessageType.WELCOME);
+        String response = input.readLine();
+        String[] parts = response.split(":",2);//
+        
+        while(MessageType.valueOf(parts[0]) != MessageType.SUCCESS){
+            System.out.println(MessageType.valueOf(parts[0]));
+            if (MessageType.valueOf(parts[0]) == MessageType.LOGIN){
+                if(isValidToken(parts[1])) {
+                    token = UUID.fromString(parts[1]);
+                    username = server.getConnectedClients().get(token);
+    
+                    output.println(MessageType.AUTHENTICATION_SUCESS);
+                    break;
+                }else{
+                    output.println(MessageType.AUTHENTICATION_FAILURE);
+                }
+            }else {
+                username = parts[1];
+                token = generateToken();
+                server.getConnectedClients().put(token, username);
+                UserTokenFileHandler.addUserTokenPair(token, username);
+
+                output.println(MessageType.AUTHENTICATION_RESPONSE + ":" + token.toString());
+
+            }
+            response = input.readLine();
+            parts = response.split(":",2);
+        }
+
+        user = new User(socket, token, response, 0);
+
+        System.out.println("User " + username + " has connected to the server ");
+    }
+
+    private void menu() throws IOException {
+        while(true){
+            output.println(MessageType.MAIN_MENU_PICK_OPTION);
+
+            String choice = input.readLine();
+            MessageType message = MessageType.valueOf(choice);
+            
+
+            if (message == MessageType.JOIN_QUEUE) {
+                if (server.handleJoinQueue(new User(socket, token, username, 0))){//break out of loop if client join wait queue
+                    output.println(MessageType.QUEUE_JOIN_SUCESS+":"+server.getWaitingClients().size());
+                    break;
+                } 
+
+            }else if (message == MessageType.QUIT) {
+                input.close();
+                output.close();
+                socket.close();
+                break;
+            }else {
+                output.println(MessageType.MAIN_MENU_INVALID_OPTION);
+            }
         }
     }
 
