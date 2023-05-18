@@ -2,8 +2,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -13,19 +12,19 @@ public class GameServer {
     private final int port;
     private final int maxThreads;
     private final ThreadPoolExecutor gameThreadPool;
-    private final ConcurrentHashMap<UUID, String> connectedClients;//second value is user token
+    private final MyConcurrentHashMap<UUID, String> connectedClients;//second value is user token
     //private final ConcurrentHashMap<UUID, Socket> waitingClients;//second string is socket user is connected to
-    private final ConcurrentLinkedQueue<User> waitQueue;
-    private final ConcurrentHashMap<UUID, Game> playingGames;//second item is game instance
+    private final MyConcurrentLinkedQueue<User> waitQueue;
+    private final MyConcurrentHashMap<UUID, Game> playingGames;//second item is game instance
 
     public GameServer(int port, int maxThreads) {
         this.port = port;
         this.maxThreads = maxThreads;
         this.gameThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
-        this.connectedClients = new ConcurrentHashMap<>();
+        this.connectedClients = new MyConcurrentHashMap<>();
         //this.waitingClients = new ConcurrentHashMap<>();
-        this.playingGames = new ConcurrentHashMap<>();
-        this.waitQueue = new ConcurrentLinkedQueue<>();
+        this.playingGames = new MyConcurrentHashMap<>();
+        this.waitQueue = new MyConcurrentLinkedQueue<>();
     }
 
     public void sendToMenu(User user){
@@ -85,15 +84,15 @@ public class GameServer {
         return false;
     }
 
-    public ConcurrentHashMap<UUID, String> getConnectedClients(){
+    public MyConcurrentHashMap<UUID, String> getConnectedClients(){
         return connectedClients;
     }
 
-    public ConcurrentLinkedQueue<User> getWaitingClients(){
+    public MyConcurrentLinkedQueue<User> getWaitingClients(){
         return waitQueue;
     }
 
-    public ConcurrentHashMap<UUID, Game> getPlayingGames(){//TODO: do we really need this
+    public MyConcurrentHashMap<UUID, Game> getPlayingGames(){//TODO: do we really need this
         return playingGames;
     }
 

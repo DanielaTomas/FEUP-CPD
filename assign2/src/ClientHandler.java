@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -93,7 +92,6 @@ public class ClientHandler implements Runnable {
                     output.println(MessageType.QUEUE_JOIN_SUCESS+":"+server.getWaitingClients().size());
                     break;
                 } 
-
             }else if (message == MessageType.QUIT) {
                 input.close();
                 output.close();
@@ -123,8 +121,6 @@ public class ClientHandler implements Runnable {
                 return true;
             } 
         }
-
-        //if ( tempToken != null && server.getConnectedClients().containsKey(tempToken) ) return false;
         
         return false;
         
@@ -133,43 +129,8 @@ public class ClientHandler implements Runnable {
     private UUID generateToken() {
         return UUID.randomUUID();
     }
-    /* 
-    private void findOpponent() {
-        waitingClients.put(username, token);
-        output.println("Finding opponent...");
-        while (true) {
-            // Check if there are any waiting clients
-            if (waitingClients.size() > 1) {
-                // Remove the current client from the waiting list
-                waitingClients.remove(username);
 
-                // Get the first waiting client
-                String opponentUsername = waitingClients.keys().nextElement();
-                String opponentToken = waitingClients.remove(opponentUsername);
-
-                // Add the two clients to the playing list
-                playingClients.put(username, opponentToken);
-                playingClients.put(opponentUsername, token);
-
-                // Start a new game
-                //TicTacToeGame game = new TicTacToeGame(username, opponentUsername, token, opponentToken);
-                //executor.submit(game);
-                break;
-            }
-        }
-    }
-
-            private void viewWaitingList() {
-        if (waitingClients.isEmpty()) {
-            output.println("There are no clients waiting.");
-        } else {
-            output.println("Clients waiting:");
-            for (String waitingClient : waitingClients.keySet()) {
-                output.println(waitingClient);
-            }
-        }
-    }
-
+    /*
     private void quit() {
         // Remove the client from any lists
         
