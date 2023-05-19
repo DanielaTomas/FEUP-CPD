@@ -11,7 +11,8 @@ public class GameServer {
 
     private final int port;
     private static final int MAX_GAMES = 5;
-    private static final int MIN_PLAYERS_PER_GAME = 5;
+    private static final int MIN_PLAYERS_PER_GAME = 2;
+    private static final int MAX_PLAYERS_PER_GAME = 5;
     private final ThreadPoolExecutor gameThreadPool;
     private final MyConcurrentHashMap<UUID, String> connectedClients;//second value is user token
     private final MyConcurrentHashMap<UUID, Integer> QueuePositions;//second string is socket user is connected to
@@ -64,11 +65,13 @@ public class GameServer {
 
     private void startGame(){
         Game gameInstance = new Game(this);
-
-        for(int i = 0; i < waitQueue.size() || i < 2; i++){
-            User currUser = waitQueue.poll();
-            System.out.println("adding " + currUser.getName() + " to a game instance");
-            gameInstance.addPlayer(currUser);
+        synchronized (waitQueue) {
+            int playersToAdd = Math.min(waitQueue.size(), MAX_PLAYERS_PER_GAME);
+            for (int i = 0; i < playersToAdd; i++) {
+                User currUser = waitQueue.poll();
+                System.out.println("Adding " + currUser.getName() + " to a game instance");
+                gameInstance.addPlayer(currUser);
+            }
         }
         gameThreadPool.execute(gameInstance);
 
@@ -119,6 +122,15 @@ public class GameServer {
 
     public MyConcurrentHashMap<UUID, String> getConnectedClients(){
         return connectedClients;
+    }
+
+    public int getQueueSize(){
+        return waitQueue.size();
+    }
+
+    public Integer getQueuePosition(UUID token){
+        if ( QueuePositions.containsKey(token) ) return QueuePositions.get(token);
+        return null;
     }
 
     public MyConcurrentLinkedQueue<User> getWaitingClients(){

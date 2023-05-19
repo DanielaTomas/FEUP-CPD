@@ -72,8 +72,9 @@ public class Game implements Runnable {
 
             //System.out.println(chosenWord);
             
+            this.broadcastMessage(MessageType.GAME_START,null);
 
-            for(int i = 0; i < 2; i++) this.onlineGameLoop();
+            for(int i = 0; i < 1; i++) this.onlineGameLoop();
 
             this.broadcastMessage(MessageType.GAME_OVER, null);
 
@@ -81,13 +82,14 @@ public class Game implements Runnable {
                 this.server.sendToMenu(entry.getKey());
             }
 
+            
+
 
         }
 
         public void onlineGameLoop() {
             String chosenWord = this.chooseWord(words, this.random);
             String shuffledWord = this.shuffleWord(chosenWord, this.random);
-            this.broadcastMessage(MessageType.GAME_START,null);
             //this.broadcastMessage(MessageType.WORD_TO_GUESS , shuffledWord);
             
             /*for (Map.Entry<User, Integer> entry : playingClients.entrySet()) {

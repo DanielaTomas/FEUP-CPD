@@ -14,6 +14,7 @@ public enum MessageType {
     REGISTRATION, // sent when the user requests a new token (new user)
     LOGIN, // Sent when the user tries sending a token
     SUCCESS,
+    QUEUE_POSITION,
     JOIN_QUEUE,
     GUESS, // Sent to make a guess for the current word
     QUIT, // Sent to quit the game
@@ -27,6 +28,6 @@ public enum MessageType {
 
     // Messages sent by the client
     GUESS_ATTEMPT,
-    PLAY_AGAIN,
+    PLAY_AGAIN, // Unused 
     BACK_TO_MAIN_MENU,
 }

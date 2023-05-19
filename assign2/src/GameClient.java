@@ -119,6 +119,9 @@ public class GameClient {
                         case QUEUE_JOIN_SUCESS:
                             System.out.println("Joined Queue, there are currently: " + messageContent + " players in the queue");
                             break;
+                        case QUEUE_POSITION:
+                            System.out.println("You are currently in position : " + messageContent + " of the queue");
+                            break;
                         case GAME_START:
                             this.interfaceWithGame(socket);
                             break;
@@ -152,12 +155,14 @@ public class GameClient {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
             int score;
+            boolean gameOver = false;
 
             System.out.println("-------------------------------------------");
             System.out.println("Game Starting!");
             System.out.println("-------------------------------------------");
 
-            while (true){//TODO: CONTINUE HERE
+
+            while (!gameOver){//TODO: CONTINUE HERE
                 String response = input.readLine();
                 String messageContent = null;
                 if(response != null){
@@ -166,8 +171,6 @@ public class GameClient {
                     if (parts.length ==2){
                         messageContent = parts[1];
                     }
-
-                    if (message == MessageType.GAME_OVER) break;
 
                      switch (message){
                         case WORD_TO_GUESS:
@@ -183,8 +186,12 @@ public class GameClient {
                             System.out.println("Wrong! You guessed incorrectly...");
                             System.out.println("The correct word was:" + messageContent);
                             break;
+                        case GAME_OVER:
+                            gameOver = true;
+                            System.out.println("Game Over!");
+                            break;
                         default:
-                            System.out.println("Received a non-useful message for this scenario");
+                            System.out.println("Received a non-useful message for this scenario:" + message);
                         }
                     }
 
@@ -193,11 +200,10 @@ public class GameClient {
         catch (IOException ex) {
             System.out.println("I/O error: " + ex.getMessage());
         }finally{
-            scanner.close();
+            //scanner.close();
             //input.close();
             //output.close();
             //socket.close();
-            System.out.println("Game Over!");
             System.out.println("Going back to the menu...");
             System.out.println("-------------------------------------------");
         }

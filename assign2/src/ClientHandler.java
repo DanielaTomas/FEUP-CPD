@@ -33,13 +33,18 @@ public class ClientHandler implements Runnable {
 
             while (user == null) this.authenticateUser();
 
-            if (this.server.checkIfQueued(token)) {//TODO: REJOIN QUEUE HERE
+            /*if (this.server.checkIfQueued(token)) {//TODO: REJOIN QUEUE HERE
                 System.out.println("Attempting to resend user to queue");
-                this.server.rejoinQueue(user, socket);
+                if (this.server.rejoinQueue(user, socket) ){
+                    output.println(MessageType.QUEUE_JOIN_SUCESS+":"+server.getQueueSize());
+                    output.println(MessageType.QUEUE_POSITION+":"+server.getQueuePosition(token));
+                }
             } else{
                 System.out.println("Sendng user to menu");
                 this.menu();
-            } 
+            }*/
+
+            this.menu();
 
             //input.close();
             //output.close();
@@ -95,7 +100,8 @@ public class ClientHandler implements Runnable {
 
             if (message == MessageType.JOIN_QUEUE) {
                 if (server.handleJoinQueue(new User(socket, token, username, 0))){//break out of loop if client join wait queue
-                    output.println(MessageType.QUEUE_JOIN_SUCESS+":"+server.getWaitingClients().size());
+                    output.println(MessageType.QUEUE_JOIN_SUCESS+":"+server.getQueueSize());
+                    output.println(MessageType.QUEUE_POSITION+":"+server.getQueuePosition(token));
                     break;
                 } 
             }else if (message == MessageType.QUIT) {
