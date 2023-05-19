@@ -13,6 +13,31 @@ public class MyConcurrentLinkedQueue<E> {
         lock = new ReentrantLock();
     }
 
+
+    public E set(int index, E element){
+        lock.lock();
+        try{
+            if (index >= 0 && index < queue.size()) {
+                return queue.set(index, element);
+            }
+            throw new IndexOutOfBoundsException("Invalid index");
+        }finally{
+            lock.unlock();
+        }
+    }
+
+    public E get(int index) {
+        lock.lock();
+        try{
+            if (index >= 0 && index < queue.size()) {
+                return  queue.get(index);
+            }
+            throw new IndexOutOfBoundsException("Invalid index");
+        }finally{
+            lock.unlock();
+        }   
+    }
+
     
     public void add(E element) {
         lock.lock();

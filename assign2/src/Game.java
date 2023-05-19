@@ -81,13 +81,10 @@ public class Game implements Runnable {
                 this.server.sendToMenu(entry.getKey());
             }
 
-             //CRIAR CLIENT HANDLER AQUI
-
-            //this.broadcastMessage(MessageType.MAIN_MENU_PICK_OPTION, null);
 
         }
 
-        public void onlineGameLoop() {//TODO:jogo esta a enviar mensagem do tipo CORRECT OU INCORRECT depois de voltar para o main menu
+        public void onlineGameLoop() {
             String chosenWord = this.chooseWord(words, this.random);
             String shuffledWord = this.shuffleWord(chosenWord, this.random);
             this.broadcastMessage(MessageType.GAME_START,null);
@@ -220,6 +217,8 @@ public class Game implements Runnable {
             return response;
         }
 
+        //BELOW IS CODE FOR SINGLE PLAYER ONLY
+
         public void gameLoop(String chosenWord, String shuffledWord) {
             Game gameObject = new Game();
 
@@ -237,6 +236,7 @@ public class Game implements Runnable {
             }
 
             System.out.println("Correct word! Game Finished!\n");
+            
         }
 
         // TODO: Change function name when it is fully implemented 

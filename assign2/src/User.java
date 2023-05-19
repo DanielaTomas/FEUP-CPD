@@ -30,4 +30,19 @@ public class User {
         int newRank = rankValue + delta;
         return newRank;
     }
+
+    @Override
+    public boolean equals(Object o){
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof User)) {
+            return false;
+        }
+
+        User u = (User) o;
+
+        return this.name == u.name && this.uuid == u.uuid; 
+    }
 }

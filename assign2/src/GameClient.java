@@ -61,9 +61,6 @@ public class GameClient {
         try (Socket socket = new Socket(hostname, port)) {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
-            String serverMessage;
-            String fileName;
-            File tokenFile;
 
             while (true){
                 String response = input.readLine();
@@ -154,9 +151,6 @@ public class GameClient {
         try {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
-            String serverMessage;
-            String fileName;
-            File tokenFile;
             int score;
 
             System.out.println("-------------------------------------------");
@@ -189,15 +183,17 @@ public class GameClient {
                             System.out.println("Wrong! You guessed incorrectly...");
                             System.out.println("The correct word was:" + messageContent);
                             break;
+                        default:
+                            System.out.println("Received a non-useful message for this scenario");
                         }
                     }
-                    
+
                 }
         }
         catch (IOException ex) {
             System.out.println("I/O error: " + ex.getMessage());
         }finally{
-            //scanner.close();
+            scanner.close();
             //input.close();
             //output.close();
             //socket.close();

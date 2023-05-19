@@ -5,24 +5,24 @@ import java.util.UUID;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-//########################################## NAO SE PODE USAR COISAS DO "java.util.concurrent"!!!!!!
 public class GameServer {
 
     private final int port;
-    private final int maxThreads;
+    private static final int MAX_GAMES = 5;
+    private static final int MIN_PLAYERS_PER_GAME = 5;
     private final ThreadPoolExecutor gameThreadPool;
     private final MyConcurrentHashMap<UUID, String> connectedClients;//second value is user token
-    //private final ConcurrentHashMap<UUID, Socket> waitingClients;//second string is socket user is connected to
+    private final MyConcurrentHashMap<UUID, Integer> QueuePositions;//second string is socket user is connected to
     private final MyConcurrentLinkedQueue<User> waitQueue;
     private final MyConcurrentHashMap<UUID, Game> playingGames;//second item is game instance
 
-    public GameServer(int port, int maxThreads) {
+    public GameServer(int port) {
         this.port = port;
-        this.maxThreads = maxThreads;
-        this.gameThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
+        this.gameThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(MAX_GAMES);
         this.connectedClients = new MyConcurrentHashMap<>();
-        //this.waitingClients = new ConcurrentHashMap<>();
+        this.QueuePositions = new MyConcurrentHashMap<>();
         this.playingGames = new MyConcurrentHashMap<>();
         this.waitQueue = new MyConcurrentLinkedQueue<>();
     }
@@ -50,8 +50,8 @@ public class GameServer {
                 }
                 
 
-                if (waitQueue.size() >= 2) {
-                    System.out.println("Attempting ");
+                if (waitQueue.size() >= MIN_PLAYERS_PER_GAME) {
+                    System.out.println("Starting a new match... ");
                     this.startGame();
                 }
             }
@@ -70,18 +70,51 @@ public class GameServer {
             System.out.println("adding " + currUser.getName() + " to a game instance");
             gameInstance.addPlayer(currUser);
         }
-
         gameThreadPool.execute(gameInstance);
 
     }
 
-    public boolean handleJoinQueue(User user){
-        if (!waitQueue.contains(user)) {
-            waitQueue.add(user);
-            System.out.println("Added " + user.getName() + " to queue! ");
+    public boolean checkIfQueued(UUID token){//TODO: IMPLEMENT
+        if (QueuePositions.containsKey(token)) {
             return true;
+        } 
+        return false;
+    }
+    
+    public boolean rejoinQueue(User user, Socket newSocket){
+        Integer queuePosition = QueuePositions.get(user.getUuid());
+
+        if (queuePosition != null) {
+            synchronized(waitQueue) {
+                waitQueue.set(queuePosition, user);
+                return true;
+            }
         }
         return false;
+    }
+
+    public boolean handleJoinQueue(User user){
+        synchronized(this){//block other threads when joining queue
+            if (!waitQueue.contains(user)) {
+                waitQueue.add(user);
+                QueuePositions.put(user.getUuid(), waitQueue.size());
+                System.out.println("Added " + user.getName() + " to queue! ");
+                return true;
+            } 
+        }
+        return false;
+    }
+
+    public void shutdown() {
+        gameThreadPool.shutdown();
+
+        try {
+            // Wait for the thread pools to terminate
+            gameThreadPool.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // Handle interruption exception
+            e.printStackTrace();
+        }
     }
 
     public MyConcurrentHashMap<UUID, String> getConnectedClients(){
@@ -98,11 +131,14 @@ public class GameServer {
 
     public static void main(String[] args) {
         int port = 8080;
-        int maxThreads = 10;
 
-        GameServer server = new GameServer(port, maxThreads);
-        server.start();
+        GameServer server = new GameServer(port);
+        try{
+            server.start();
+        }catch (Exception e){
+            System.out.println("Server error: " + e.getMessage());
+        }finally{
+            server.shutdown();
+        }
     }
-
-    // add methods to manipulate connectedClients, waitingClients, and playingGames maps
 }
