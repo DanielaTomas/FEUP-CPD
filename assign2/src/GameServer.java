@@ -1,6 +1,10 @@
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import java.util.concurrent.Executors;
@@ -15,16 +19,14 @@ public class GameServer {
     private static final int MAX_PLAYERS_PER_GAME = 5;
     private final ThreadPoolExecutor gameThreadPool;
     private final MyConcurrentHashMap<UUID, String> connectedClients;//second value is user token
-    private final MyConcurrentHashMap<UUID, Integer> QueuePositions;//second string is socket user is connected to
+    private final Map<UUID, Integer> QueuePositions;//second string is socket user is connected to
     private final MyConcurrentLinkedQueue<User> waitQueue;
-    private final MyConcurrentHashMap<UUID, Game> playingGames;//second item is game instance
 
     public GameServer(int port) {
         this.port = port;
         this.gameThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(MAX_GAMES);
         this.connectedClients = new MyConcurrentHashMap<>();
-        this.QueuePositions = new MyConcurrentHashMap<>();
-        this.playingGames = new MyConcurrentHashMap<>();
+        this.QueuePositions = new HashMap<>();
         this.waitQueue = new MyConcurrentLinkedQueue<>();
     }
 
@@ -64,17 +66,33 @@ public class GameServer {
     }
 
     private void startGame(){
-        Game gameInstance = new Game(this);
+        Game gameInstance = null;
+        int playersToAdd = 0;
+        List<UUID> players = new LinkedList<>();
         synchronized (waitQueue) {
-            int playersToAdd = Math.min(waitQueue.size(), MAX_PLAYERS_PER_GAME);
+            playersToAdd = Math.min(waitQueue.size(), MAX_PLAYERS_PER_GAME);
+            gameInstance = new Game(this,playersToAdd);
             for (int i = 0; i < playersToAdd; i++) {
                 User currUser = waitQueue.poll();
                 System.out.println("Adding " + currUser.getName() + " to a game instance");
                 gameInstance.addPlayer(currUser);
+                players.add(i, currUser.getUuid());
             }
         }
-        gameThreadPool.execute(gameInstance);
+        if(gameInstance != null){
+            gameThreadPool.execute(gameInstance);
+            for (Map.Entry<UUID, Integer> entry : QueuePositions.entrySet()) {
+                UUID playerId = entry.getKey();
+                int currentPosition = entry.getValue();
 
+                if(players.contains(playerId)){
+                    QueuePositions.remove(playerId, currentPosition);
+                }else{
+                    int newPosition = currentPosition - playersToAdd;
+                    QueuePositions.put(playerId, newPosition);
+                }
+            }
+        }
     }
 
     public boolean checkIfQueued(UUID token){//TODO: IMPLEMENT
@@ -135,10 +153,6 @@ public class GameServer {
 
     public MyConcurrentLinkedQueue<User> getWaitingClients(){
         return waitQueue;
-    }
-
-    public MyConcurrentHashMap<UUID, Game> getPlayingGames(){//TODO: do we really need this
-        return playingGames;
     }
 
     public static void main(String[] args) {

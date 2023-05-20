@@ -10,16 +10,24 @@ import java.util.concurrent.TimeUnit;
 
 public class Game implements Runnable {
         private final HashMap<User, Integer> playingClients = new HashMap<>();//Integer represents score in current instance
+        private final int PLAYER_COUNT;
         private GameServer server;
         //private BufferedReader input;
         //private PrintWriter output;
         List<String> words =new ArrayList<String>();  
         Random random = new Random();
 
-        private Game(){}
+        private Game(){
+            this.PLAYER_COUNT = 1;
+        }
 
-        public Game (GameServer gameServer){
+        public Game (GameServer gameServer, int playerCount){
             this.server = gameServer;
+            this.PLAYER_COUNT = playerCount;
+        }
+
+        public int getPlayerCount(){
+            return this.PLAYER_COUNT;
         }
 
         public void addPlayer(User user){
