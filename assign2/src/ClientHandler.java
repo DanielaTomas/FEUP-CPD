@@ -34,7 +34,7 @@ public class ClientHandler implements Runnable {
             while (user == null) this.authenticateUser();
 
             if (this.server.checkIfQueued(token)) {//TODO: REJOIN QUEUE HERE
-                System.out.println("Attempting to resend user to queue");
+                System.out.println("Attempting to resend user: " + username +" to queue");
                 if (this.server.rejoinQueue(user, socket) ){
                     output.println(MessageType.QUEUE_JOIN_SUCESS+":"+server.getQueueSize());
                     output.println(MessageType.QUEUE_POSITION+":"+server.getQueuePosition(token));
@@ -43,8 +43,6 @@ public class ClientHandler implements Runnable {
                 System.out.println("Sendng user to menu");
                 this.menu();
             }
-
-            this.menu();
 
             //input.close();
             //output.close();

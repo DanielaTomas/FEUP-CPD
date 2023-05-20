@@ -2,6 +2,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class GameServer {
         Game gameInstance = null;
         int playersToAdd = 0;
         List<UUID> players = new LinkedList<>();
-        synchronized (waitQueue) {
+        synchronized (this) {
             playersToAdd = Math.min(waitQueue.size(), MAX_PLAYERS_PER_GAME);
             gameInstance = new Game(this,playersToAdd);
             for (int i = 0; i < playersToAdd; i++) {
@@ -78,18 +79,23 @@ public class GameServer {
                 gameInstance.addPlayer(currUser);
                 players.add(i, currUser.getUuid());
             }
-        }
         if(gameInstance != null){
             gameThreadPool.execute(gameInstance);
-            for (Map.Entry<UUID, Integer> entry : QueuePositions.entrySet()) {
-                UUID playerId = entry.getKey();
-                int currentPosition = entry.getValue();
+            System.out.println("Updating queue");
 
-                if(players.contains(playerId)){
-                    QueuePositions.remove(playerId, currentPosition);
-                }else{
-                    int newPosition = currentPosition - playersToAdd;
-                    QueuePositions.put(playerId, newPosition);
+
+                Iterator<Map.Entry<UUID, Integer>> iterator = QueuePositions.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<UUID, Integer> entry = iterator.next();
+                    UUID playerId = entry.getKey();
+                    int currentPosition = entry.getValue();
+            
+                    if (players.contains(playerId)) {
+                        iterator.remove();  // Safely remove the entry using the iterator's remove() method
+                    } else {
+                        int newPosition = currentPosition - playersToAdd;
+                        QueuePositions.put(playerId, newPosition);
+                    }
                 }
             }
         }
@@ -107,7 +113,7 @@ public class GameServer {
 
         if (queuePosition != null) {
             synchronized(waitQueue) {
-                waitQueue.set(queuePosition, user);
+                waitQueue.set(queuePosition - 1, user);
                 return true;
             }
         }
@@ -164,7 +170,7 @@ public class GameServer {
         }catch (Exception e){
             System.out.println("Server error: " + e.getMessage());
         }finally{
-            server.shutdown();
+            //server.shutdown();
         }
     }
 }
