@@ -16,7 +16,7 @@ public class GameServer {
 
     private final int port;
     private static final int MAX_GAMES = 5;
-    private static final int MIN_PLAYERS_PER_GAME = 2;
+    private static final int MIN_PLAYERS_PER_GAME = 3;
     private static final int MAX_PLAYERS_PER_GAME = 5;
     private final ThreadPoolExecutor gameThreadPool;
     private final MyConcurrentHashMap<UUID, String> connectedClients;//second value is user token
