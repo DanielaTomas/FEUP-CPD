@@ -103,6 +103,12 @@ public class ClientHandler implements Runnable {
                     break;
                 } 
             }else if (message == MessageType.QUIT) {
+                output.println(MessageType.QUIT_ACK);
+
+                System.out.println("Goodbye " + username + "!");
+
+                this.server.getConnectedClients().remove(token);
+                
                 input.close();
                 output.close();
                 socket.close();

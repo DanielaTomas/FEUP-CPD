@@ -61,8 +61,8 @@ public class GameClient {
         try (Socket socket = new Socket(hostname, port)) {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
-
-            while (true){
+            boolean shouldRun = true;
+            while (shouldRun){
                 String response = input.readLine();
                 String messageContent = null;
                 if(response != null){
@@ -97,6 +97,13 @@ public class GameClient {
                                 System.out.println("Registration was unsucessfull...");
                             }
                             break;
+                        case QUIT_ACK:
+                            shouldRun = false;
+                            //output.close();
+                            //input.close();
+                            //scanner.close();
+                            //socket.close();
+                            break;
                         case MAIN_MENU_PICK_OPTION:
                             System.out.println("Select an option:\n" +
                                                 "1. Find an opponent\n" +
@@ -107,10 +114,6 @@ public class GameClient {
                                 output.println(MessageType.JOIN_QUEUE);
                             }else if (option == 2){
                                 output.println(MessageType.QUIT);
-                                output.close();
-                                input.close();
-                                scanner.close();
-                                socket.close();
                             } else if (option == 3){//SINGLE PLAYER
                                 game.testPlayGame();
                                 //output.println(MessageType.JOIN_QUEUE);
@@ -131,8 +134,7 @@ public class GameClient {
 
                 }
             }
-            
- 
+
         } catch (UnknownHostException ex) {
  
             System.out.println("Server not found: " + ex.getMessage());
@@ -141,9 +143,9 @@ public class GameClient {
  
             System.out.println("I/O error: " + ex.getMessage());
         }finally{
-            scanner.close();
+            //scanner.close();
             //input.close();
-            output.close();
+            //if( output != null ) output.close();
             //socket.close();
         }
     }

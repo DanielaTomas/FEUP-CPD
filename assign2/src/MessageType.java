@@ -8,6 +8,7 @@ public enum MessageType {
     MAIN_MENU_PICK_OPTION, //Sent when the user has to pick an option of the main menu
     MAIN_MENU_INVALID_OPTION, //Sent when the option is picked is invalid
     QUEUE_JOIN_SUCESS,
+    QUIT_ACK,
     GAME_OVER, // Sent when the game is over
     
     // Messages sent by the client
